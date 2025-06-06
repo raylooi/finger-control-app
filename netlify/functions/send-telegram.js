@@ -4,7 +4,6 @@ exports.handler = async (event, context) => {
   console.log('HTTP Method:', event.httpMethod);
   console.log('Headers:', JSON.stringify(event.headers, null, 2));
   console.log('Body:', event.body);
-  console.log('Event keys:', Object.keys(event));
   
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
@@ -31,12 +30,7 @@ exports.handler = async (event, context) => {
       },
       body: JSON.stringify({ 
         error: 'Method not allowed',
-        received_method: event.httpMethod,
-        debug_info: {
-          method: event.httpMethod,
-          headers: event.headers,
-          bodyType: typeof event.body
-        }
+        received_method: event.httpMethod
       })
     };
   }
@@ -58,8 +52,9 @@ exports.handler = async (event, context) => {
 
     const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
     
-    // Use node-fetch or native fetch
-    const fetch = (await import('node-fetch')).default;
+    console.log('Sending to Telegram:', telegramUrl);
+    
+    // Use native fetch (available in Node.js 18+)
     const response = await fetch(telegramUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -67,6 +62,7 @@ exports.handler = async (event, context) => {
     });
 
     const result = await response.json();
+    console.log('Telegram response:', result);
 
     return {
       statusCode: response.ok ? 200 : 400,
