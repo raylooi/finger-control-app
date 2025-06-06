@@ -1,6 +1,14 @@
 export default async (event, context) => {
+  // DEBUG: Log what we're actually receiving
+  console.log('=== FUNCTION DEBUG ===');
+  console.log('HTTP Method:', event.httpMethod);
+  console.log('Headers:', JSON.stringify(event.headers, null, 2));
+  console.log('Body:', event.body);
+  console.log('Event keys:', Object.keys(event));
+  
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
+    console.log('Handling OPTIONS request');
     return new Response('', {
       status: 200,
       headers: {
@@ -11,9 +19,18 @@ export default async (event, context) => {
     });
   }
 
-  // Only allow POST requests
+  // Check for POST - but be more flexible
   if (event.httpMethod !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+    console.log('Not a POST request. Method was:', event.httpMethod);
+    return new Response(JSON.stringify({ 
+      error: 'Method not allowed',
+      received_method: event.httpMethod,
+      debug_info: {
+        method: event.httpMethod,
+        headers: event.headers,
+        bodyType: typeof event.body
+      }
+    }), {
       status: 405,
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -23,6 +40,7 @@ export default async (event, context) => {
   }
 
   try {
+    console.log('Processing POST request...');
     const { botToken, chatId, message } = JSON.parse(event.body);
 
     if (!botToken || !chatId || !message) {
@@ -54,6 +72,7 @@ export default async (event, context) => {
     });
 
   } catch (error) {
+    console.log('Error in function:', error);
     return new Response(JSON.stringify({ 
       error: 'Server error', 
       details: error.message 
