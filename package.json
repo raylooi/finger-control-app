@@ -1,0 +1,13 @@
+{
+  "name": "finger-control-telegram",
+  "version": "1.0.0",
+  "description": "Finger control interface with Telegram integration",
+  "type": "module",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'No build step required'"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
